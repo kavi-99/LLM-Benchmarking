@@ -20,7 +20,7 @@ class vLLM(ProviderInterface):
 
         # Define available models
         self.model_map = {
-            "common-model": "meta-llama/Llama-3.3-70B-Instruct",
+            "common-model": "./../scratch/models--meta-llama--Llama-3.3-70B-Instruct/snapshots/6f6073b423013f6a7d4d9f39144961bfbfbc386b",
             "common-model-small": "meta-llama/Llama-3.1-8B"
         }
 
@@ -76,6 +76,7 @@ class vLLM(ProviderInterface):
         generated_text = ""
 
         try:
+            print(f"http://{vllm_ip}:{self.vllm_port}/v1/completions")
             start_time = time.perf_counter()
             response = requests.post(
                 f"http://{vllm_ip}:{self.vllm_port}/v1/completions",

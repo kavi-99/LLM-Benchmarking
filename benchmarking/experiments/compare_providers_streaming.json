@@ -1,11 +1,9 @@
 
 {
-    "providers": [
-        "Azure",
-        "Groq",
+    "providers":[
+        "vLLM",
         "Hyperbolic",
         "OpenAI",
-        "PerplexityAI",
         "TogetherAI",
         "Cloudflare",
         "Google",
@@ -20,7 +18,8 @@
     "streaming": true,
     "max_output": 100,
     "verbose": true,
-    "backend": true
+    "backend": false,
+    "vllm_ip": "10.168.0.7"
 }
 
 
