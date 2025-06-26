@@ -1,0 +1,157 @@
+# TMR, Coefficient of Variation
+
+import pandas as pd
+import glob
+import os
+import ast
+
+graph_dir = "experiments/zexp_5.2_deepseek_plots/results/tokens"
+
+exp_dirs = {
+    "aws": "experiments/exp_20250618_162522_20f4040a",
+    "azure": "experiments/exp_20250618_162137_e31b40f5",
+    "vllm": "experiments/exp_20250619_112437_c70b32bc",
+    "tgt": "experiments/exp_20250618_163312_f98e83f7"
+}
+
+# 2) Read each folder’s CSVs into a dict of lists-of-DataFrames
+dfs = {}
+all_dfs = {}
+skip_idxs = {0, 3, 7}
+for name, folder in exp_dirs.items():
+    pattern = os.path.join(folder, "*.csv")
+    paths   = glob.glob(pattern)
+    all_dfs[name] = [pd.read_csv(p) for p in paths]
+    dfs[name] = [
+        df
+        for idx, df in enumerate(all_dfs[name])
+        if idx not in skip_idxs
+    ]
+    for i, df in enumerate(dfs[name]):
+        print(i, df['metric'].unique())
+    print(f"{name}: loaded {len(dfs[name])} CSV(s) from {folder}")
+
+# 3) Build dfs_all by zipping in the same provider-order
+provider_order = list(exp_dirs.keys())  # e.g. ["google", "openai", …, "vllm"]
+# get list-of-lists in order:
+list_of_df_lists = [dfs[p] for p in provider_order]
+
+# 4) Concatenate the i-th file of each provider across all providers
+dfs_all = [
+    pd.concat(dfs_tuple, ignore_index=True)
+    for dfs_tuple in zip(*list_of_df_lists)
+]
+
+print(f"Built {len(dfs_all)} combined DataFrames in dfs_all")
+
+# Remove total_tokens and accuracy as before
+total_tokens = dfs_all.pop(4)
+dpsk_output = dfs_all.pop(6)
+for i, df in enumerate(dfs_all):
+    print(df.head(1))
+#     # want to remove entries with model = "common-model-small"
+    print(df['metric'].unique())
+    print(df['provider'].unique())
+    print(df['model'].unique())
+    print(df['max_output'].unique())
+    print(df['input_size'].unique())
+    print(f"combined #{i}: {df.shape}")
+    print("-----------------")
+
+# 1) Build a dict of your metric‐DataFrames by name
+metric_dfs = { df['metric'].iloc[0] : df for df in dfs_all }
+
+# 2) Pull out the median & p99 frames
+df_med  = metric_dfs['timebetweentokens_median'].reset_index(drop=True)
+df_p95  = metric_dfs['timebetweentokens_p95'].reset_index(drop=True)
+
+# 3) Group and compute mean values
+med_means = df_med.groupby('provider')['value'].mean().rename('median_mean_tbt')
+p95_means = df_p95.groupby('provider')['value'].mean().rename('p95_mean_tbt')
+
+# 4) Combine and compute ratio
+summary = pd.concat([p95_means, med_means], axis=1).reset_index()
+summary['tmr'] = summary['p95_mean_tbt'] / summary['median_mean_tbt']
+
+# 5) Output
+print("TMR Table")
+print(summary.to_markdown(index=False))
+
+# Optional: save
+os.makedirs(graph_dir, exist_ok=True)
+summary.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
+
+# Extract the raw TBT DataFrame
+df_tbt = metric_dfs['timebetweentokens'].reset_index(drop=True)
+
+# Initialize list to store parsed durations with providers
+flattened = []
+
+# Loop through each row, parse value list, associate with provider
+for i, row in df_tbt.iterrows():
+    val = row['value']
+    provider = row['provider']
+
+    if isinstance(val, str):
+        try:
+            parsed_list = ast.literal_eval(val)
+            flattened.extend([(provider, float(x)) for x in parsed_list])
+        except (ValueError, SyntaxError) as e:
+            print(f"Error parsing row {i}: {val[:50]}... Error: {e}")
+            continue
+    elif isinstance(val, list):
+        flattened.extend([(provider, float(x)) for x in val])
+    else:
+        print(f"Skipping row {i}: unsupported type {type(val)}")
+
+# Convert to DataFrame
+df_flat = pd.DataFrame(flattened, columns=['provider', 'tbt'])
+
+# Convert to milliseconds (if needed)
+df_flat['tbt'] = df_flat['tbt'] * 1000
+
+# Compute mean, std, CV per provider
+cv_stats = (
+    df_flat
+    .groupby('provider')['tbt']
+    .agg(['mean', 'std'])
+    .rename(columns={'mean': 'mean_tbt', 'std': 'std_tbt'})
+)
+cv_stats['cv'] = cv_stats['std_tbt'] / cv_stats['mean_tbt']
+
+# Join with your TMR summary
+summary = summary.set_index('provider').join(cv_stats).reset_index()
+
+# Show result
+print("TBT TMR and CV")
+print(summary.to_markdown(index=False))
+
+
+# Optional: save
+os.makedirs(graph_dir, exist_ok=True)
+summary.to_csv(os.path.join(graph_dir, "tmr_tbt.csv"), index=False)
+
+df = metric_dfs['timetofirsttoken'].reset_index(drop=True)
+
+stats = (
+    df.groupby(['provider','input_size'])['value']
+    .quantile([0.5, 0.95, 0.99])
+    .unstack(level=-1)
+    .rename(columns={0.5:'median',0.95:'p95',0.99:'p99'})
+)
+
+stats['tmr'] = stats['p95'] / stats['median']
+
+# Compute coefficient of variation
+agg_stats = (
+    df
+    .groupby(['provider', 'input_size'])['value']
+    .agg(['mean', 'std'])
+)
+agg_stats['cv'] = agg_stats['std'] / agg_stats['mean']
+
+# Merge CV into stats
+stats = stats.join(agg_stats)
+print()
+print("TTFT TMR and CV")
+print(stats)
