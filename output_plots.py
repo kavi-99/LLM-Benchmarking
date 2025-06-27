@@ -226,7 +226,9 @@ summary_by_group.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
 # summary_by_output.to_csv(out_path, index=False)
 # print(f"Saved full ratio table to {out_path}")
 
-desired_metrics = ['timetofirsttoken', 'response_times', "timebetweentokens"]
+# desired_metrics = ['timetofirsttoken', 'response_times', "timebetweentokens"]
+desired_metrics = ['timetofirsttoken', 'response_times', "timebetweentokens_avg"]
+
 dfs_filtered = []
 
 for df in dfs_all:

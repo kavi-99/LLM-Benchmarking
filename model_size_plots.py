@@ -233,7 +233,9 @@ summary_by_group.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
 # print(ratio_df[['provider','model','p95_to_median']].head())
 
 # Filter for desired metrics
-desired_metrics = ['timetofirsttoken', 'response_times', "timebetweentokens"]
+# desired_metrics = ['timetofirsttoken', 'response_times', "timebetweentokens"]
+desired_metrics = ['timetofirsttoken', 'response_times', "timebetweentokens_avg"]
+
 # desired_metrics = ["timebetweentokens"]
 dfs_filtered = []
 

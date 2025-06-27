@@ -101,7 +101,7 @@ print("TMR Table (Grouped by provider, input_size)")
 print(summary_by_group.to_markdown(index=False))
 
 os.makedirs(graph_dir, exist_ok=True)
-summary_by_group.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
+# summary_by_group.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
 
 # 1) Build a dict of your metric‐DataFrames by name
 # metric_dfs = { df['metric'].iloc[0] : df for df in dfs_all }
@@ -184,7 +184,8 @@ summary_by_group.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
 
 # print(ratio_df[['provider','input_size','p95_to_median']].head())
 
-desired_metrics = ['timetofirsttoken', 'response_times', "timebetweentokens"]
+# desired_metrics = ['timetofirsttoken', 'response_times', "timebetweentokens"]
+desired_metrics = ['timetofirsttoken', 'response_times', "timebetweentokens_avg"]
 dfs_filtered = []
 
 for df in dfs_all:
