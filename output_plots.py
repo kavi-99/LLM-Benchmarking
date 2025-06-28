@@ -143,7 +143,7 @@ print("TMR Table (Grouped by provider, max_output)")
 print(summary_by_group.to_markdown(index=False))
 
 os.makedirs(graph_dir, exist_ok=True)
-summary_by_group.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
+#summary_by_group.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
 # # for provider in provider
 # metric_dfs = { df['metric'].iloc[0] : df for df in dfs_all }
 
@@ -227,7 +227,7 @@ summary_by_group.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
 # print(f"Saved full ratio table to {out_path}")
 
 # desired_metrics = ['timetofirsttoken', 'response_times', "timebetweentokens"]
-desired_metrics = ['timetofirsttoken', 'response_times', "timebetweentokens_avg"]
+desired_metrics = ['timetofirsttoken', 'response_times',"timebetweentokens_p95", "timebetweentokens_avg"]
 
 dfs_filtered = []
 
@@ -247,7 +247,8 @@ fig, axes = plt.subplots(1, len(dfs_all), figsize=(13, 3.5), sharey=True)
 display_titles = {
 'timebetweentokens': 'TBT',
 'timetofirsttoken': 'TTFT',
-'response_times': 'TRT'
+'response_times': 'TRT',
+'timebetweentokens_avg': 'TBT Average'
 }
 
 linestyles = {

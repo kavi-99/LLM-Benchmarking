@@ -100,7 +100,7 @@ summary_by_group['tmr'] = summary_by_group['p95_mean_tbt'] / summary_by_group['m
 print("TMR Table (Grouped by provider, input_size)")
 print(summary_by_group.to_markdown(index=False))
 
-os.makedirs(graph_dir, exist_ok=True)
+# os.makedirs(graph_dir, exist_ok=True)
 # summary_by_group.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
 
 # 1) Build a dict of your metric‐DataFrames by name
@@ -204,7 +204,8 @@ fig, axes = plt.subplots(1, len(dfs_all), figsize=(13, 3.5), sharey=True)
 display_titles = {
 'timebetweentokens': 'TBT',
 'timetofirsttoken': 'TTFT',
-'response_times': 'TRT'
+'response_times': 'TRT',
+'timebetweentokens_avg': 'TBT Average'
 }
 
 linestyles = {

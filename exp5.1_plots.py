@@ -185,7 +185,8 @@ plt.rcParams.update({
 display_titles = {
     'timebetweentokens': 'TBT',
     'timetofirsttoken': 'TTFT',
-    'response_times': 'TRT'
+    'response_times': 'TRT',
+    'timebetweentokens_avg': 'TBT Average'
 }
 
 # Plot each metric in its own subplot

@@ -149,7 +149,7 @@ print("TMR Table (Grouped by provider, model)")
 print(summary_by_group.to_markdown(index=False))
 
 os.makedirs(graph_dir, exist_ok=True)
-summary_by_group.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
+#summary_by_group.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
 
 # # 1) Build a dict of your metric‐DataFrames by name
 # metric_dfs = { df['metric'].iloc[0] : df for df in dfs_all }
@@ -267,7 +267,8 @@ print(f"\nFinal filtered DataFrames count: {len(dfs_all)}")
 display_titles = {
     'timebetweentokens': 'TBT',
     'timetofirsttoken': 'TTFT',
-    'response_times': 'TRT'
+    'response_times': 'TRT',
+    'timebetweentokens_avg': 'TBT Average'
 }
 
 # linestyles = {

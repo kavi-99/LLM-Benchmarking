@@ -83,7 +83,7 @@ print(summary.to_markdown(index=False))
 
 # Optional: save
 os.makedirs(graph_dir, exist_ok=True)
-summary.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
+#summary.to_csv(os.path.join(graph_dir, "tmr_df.csv"), index=False)
 
 # # 3) Make sure they align on the same “keys”:
 # #    if each row is a distinct request you can join on index…
@@ -163,7 +163,8 @@ fig, axes = plt.subplots(1, len(dfs_all), figsize=(13, 3.5), sharey=True)
 display_titles = {
 'timebetweentokens': 'TBT',
 'timetofirsttoken': 'TTFT',
-'response_times': 'TRT'
+'response_times': 'TRT',
+'timebetweentokens_avg': 'TBT Average'
 }
 
 # linestyles = {
