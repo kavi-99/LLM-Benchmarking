@@ -54,16 +54,16 @@ for name, folder in exp_dirs.items():
             continue
 
         # if this is the first provider, take only the first 100 rows
-        if name == first_provider:
-            dfs[name].append(df.head(100))
-        # if name == last_provider:
-        #     dfs[name].append(df.head(201))
-        elif name == "togetherai":
-            dfs[name].append(df.head(200))
-        elif name == "vllm_azure":
-            dfs[name].append(df.head(583))
-        else:
-            dfs[name].append(df)
+        # if name == first_provider:
+        #     dfs[name].append(df.head(100))
+        # # if name == last_provider:
+        # #     dfs[name].append(df.head(201))
+        # elif name == "togetherai":
+        #     dfs[name].append(df.head(200))
+        # elif name == "vllm_azure":
+        #     dfs[name].append(df.head(583))
+        # else:
+        dfs[name].append(df)
     for i, df in enumerate(dfs[name]):
         print(i, df['metric'].unique())
     print(f"{name}: loaded {len(dfs[name])} CSV(s) from {folder}")
